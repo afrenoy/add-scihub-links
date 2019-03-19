@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
 
 import pdfrw
-inputpdf = pdfrw.PdfReader("Frenoy2018.pdf")
+import argparse
+import tempfile
+import os
+
+parser = argparse.ArgumentParser(description="Add links to sci-hub for all hyperlinks with DOIs found in the article")
+parser.add_argument('inputfile', type=str, help='input pdf')
+oparser = parser.add_mutually_exclusive_group()
+oparser.add_argument('outputfile', nargs='?', type=str, help='output pdf')
+oparser.add_argument('-i', metavar='extension', nargs='?', type=str, help='edit file inplace (save a backup with specified extension if provided)')
+args = parser.parse_args()
+
+if (not args.outputfile) and (not args.i):
+    print("Error: no outputfile nor inplace option provided")
+    exit(-1)
+
+inputpdf = pdfrw.PdfReader(args.inputfile)
 
 logo = pdfrw.PdfReader("logo_raven.pdf").pages[0]
-size_x=15
-size_y=None
-x_offset=1
-y_offset=3
+
+size_x = 15
+size_y = None
+x_offset = 1
+y_offset = 3
 
 found_doi=set()
 
@@ -56,4 +72,12 @@ for page in inputpdf.pages:
             pdfrw.PageMerge(page).add(wmark).render()
 
 
-pdfrw.PdfWriter("test_add2.pdf", trailer=inputpdf).write()
+if args.i:
+    tmp = tempfile.NamedTemporaryFile(dir='.', delete=False)
+    pdfrw.PdfWriter(tmp, trailer=inputpdf).write()
+    tmp.close()
+    os.replace(args.inputfile, args.inputfile + '.' + args.i)
+    os.replace(tmp.name, args.inputfile)
+else:
+    pdfrw.PdfWriter(args.outputfile, trailer=inputpdf).write()
+
