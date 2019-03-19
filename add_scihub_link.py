@@ -18,7 +18,8 @@ if (not args.outputfile) and (not args.i):
 
 inputpdf = pdfrw.PdfReader(args.inputfile)
 
-logo = pdfrw.PdfReader("logo_raven.pdf").pages[0]
+logofile = os.path.join(os.path.dirname(__file__),"logo_raven.pdf")
+logo = pdfrw.PdfReader(logofile).pages[0]
 
 size_x = 15
 size_y = None
