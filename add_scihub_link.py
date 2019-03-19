@@ -29,6 +29,8 @@ y_offset = 3
 found_doi=set()
 
 for page in inputpdf.pages:
+    if not page.Annots:  # Nothing on this page
+        continue
     for i in range(len(page.Annots)):
         annot = page.Annots[i]
         link = annot['/A']
