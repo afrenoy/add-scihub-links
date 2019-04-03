@@ -4,6 +4,8 @@ import pdfrw
 import argparse
 import tempfile
 import os
+import subprocess
+import time
 
 parser = argparse.ArgumentParser(description="Add links to sci-hub for all hyperlinks with DOIs found in the article")
 parser.add_argument('inputfile', type=str, help='input pdf')
@@ -16,7 +18,15 @@ if (not args.outputfile) and (not args.i):
     print("Error: no outputfile nor inplace option provided")
     exit(-1)
 
-inputpdf = pdfrw.PdfReader(args.inputfile)
+try:
+    inputpdf = pdfrw.PdfReader(args.inputfile)
+except pdfrw.errors.PdfParseError:
+    print("Error when reading the PDF, trying to fix with ghostscript...", end='')
+    tmp = tempfile.NamedTemporaryFile(dir='.', suffix='.pdf')
+    tmp_name = tmp.name
+    subprocess.run(["gs", "-o", tmp_name, "-q", "-sDEVICE=pdfwrite", "-dPDFSETTINGS=/prepress", "-dPRINTED=false", args.inputfile], capture_output=True)
+    inputpdf = pdfrw.PdfReader(tmp_name)
+    print(" Success")
 
 logofile = os.path.join(os.path.dirname(__file__),"logo_raven.pdf")
 logo = pdfrw.PdfReader(logofile).pages[0]
