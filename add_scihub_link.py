@@ -36,13 +36,15 @@ for page in inputpdf.pages:
         link = annot['/A']
         if not link:
             continue
+        if not ('/URI' in link):
+            continue
         uri = link['/URI'].to_unicode()
-        if 'https://doi.org' in uri:
+        if ('https://doi.org' in uri) or ('http://doi.org' in uri) or ('https://dx.doi.org' in uri) or ('http://dx.doi.org' in uri):
             if uri in found_doi:  # We already saw this DOI before
                 continue
             found_doi.add(uri)
             # Find the sci-hub url
-            newlink = pdfrw.objects.pdfstring.PdfString.from_unicode(uri.replace("doi.org","sci-hub.tw"))
+            newlink = pdfrw.objects.pdfstring.PdfString.from_unicode(uri.replace("dx.doi.org","sci-hub.tw").replace("doi.org","sci-hub.tw"))
             # Create a new hypertext link in the pdf
             # pdfrw does not provide functions for deep copy, so we have to improvise
             newannot = pdfrw.objects.pdfdict.PdfDict(annot)
@@ -84,3 +86,4 @@ if args.i:
 else:
     pdfrw.PdfWriter(args.outputfile, trailer=inputpdf).write()
 
+print("%s: found %d DOI links" % (args.inputfile, len(found_doi)))
