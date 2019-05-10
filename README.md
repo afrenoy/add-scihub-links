@@ -20,6 +20,6 @@ Basic use: `add_scihub_links input.pdf output.pdf`
 See full documentation with `add_scihub_links -h`
 
 ## Example
-See an example of the result [here](examples/Wang2019_links.pdf), obtained from [this article](https://doi.org/10.1371/journal.pbio.3000224).
+See an example of the result [here](https://github.com/afrenoy/add-scihub-links/raw/master/examples/Wang2019_links.pdf), obtained from [this article](https://doi.org/10.1371/journal.pbio.3000224).
 
 ![Example of sci-hub links inserted in the PDF](examples/example.png)
